@@ -23,3 +23,6 @@ npm run init
 cd pdftron-webpart-sample
 gulp serve
 ```
+You should be able to add a new *PDFTronSample* web part looking like the following below.
+
+![image](https://raw.githubusercontent.com/mike-mh/pdftron-sharepoint-web-part-sample/main/.github/images/localhost-image.png)
