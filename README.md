@@ -7,7 +7,7 @@ To get started you'll need Yeoman and Gulp installed.
 
 ```
 npm install -g yo
-npm install --global gulp-cli
+npm install -g gulp-cli
 ```
 
 After this is installed you'll need to isntall the *@microsoft/sharepoint* generator
