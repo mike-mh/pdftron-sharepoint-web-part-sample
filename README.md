@@ -7,7 +7,7 @@ To get started you'll need Yeoman and Gulp installed.
 
 ```
 npm i -g yo
-npm i -g gulp-cli
+npm i -g gulp
 ```
 
 After this is installed you'll need to isntall the *@microsoft/sharepoint* generator
@@ -23,3 +23,6 @@ npm run init
 cd pdftron-webpart-sample
 gulp serve
 ```
+You should be able to add a new *PDFTronSample* web part looking like the following below.
+
+![image](https://raw.githubusercontent.com/mike-mh/pdftron-sharepoint-web-part-sample/main/.github/images/localhost-image.png)
