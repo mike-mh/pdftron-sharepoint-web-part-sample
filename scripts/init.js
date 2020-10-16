@@ -81,6 +81,24 @@ const installPdfTronWebViewer = () => new Promise((res, rej) => {
   });
 });
 
+const trustDevCert = () => new Promise((res, rej) => {
+  process.chdir('./pdftron-webpart-sample');
+  trustDevCertificateProcess = spawn('gulp', [
+    'trust-dev-cert',
+  ]);
+
+  trustDevCertificateProcess.stdout.pipe(process.stdout);
+  trustDevCertificateProcess.stderr.pipe(process.stderr);
+
+  trustDevCertificateProcess.on('exit', code => {
+    if (!!code) {
+      rej('Failed to trust dev certificate');
+    } 
+    process.chdir('..');
+    res();
+  });
+}); 
+
 const migratePdfTronWebPart = () => new Promise((res, rej) => {
   const ncp = require('ncp').ncp;
   ncp.limit = 16;
@@ -106,6 +124,7 @@ async function main() {
   try {
     await runNpmInstall();
     await runYeomanSharePointGenerator();
+    await trustDevCert();
     await installPdfTronWebViewer();
     await migratePdfTronWebPart();
   }
@@ -116,38 +135,3 @@ async function main() {
 
 main();
 
-/*
-installSharePointGenerator.stdout.pipe(process.stdout);
-installSharePointGenerator.stderr.pipe(process.stderr);
-
-installSharePointGenerator.stdout.on('data', function (data) {
-  if (data.toString().includes('?')) {
-    installSharePointGenerator.stdin.write("N\n")
-  }
-});
-
-installSharePointGenerator.stderr.on('data', function (data) {
-  if (data.toString().includes('?')) {
-    installSharePointGenerator.stdin.write("N\n")
-  }
-});
-
-installSharePointGenerator.on('exit', code => {
-  console.log('child process exited with code ' + code.toString());
-
-  const installPdfTronProcess = createPdfTronInstallProcess();
-  installPdfTronProcess.stdout.pipe(process.stdout);
-  installPdfTronProcess.stderr.pipe(process.stderr);
-
-  installPdfTronProcess.on('exit', _ => {
-    fs.mkdirSync('./pdftron-webpart-sample/_catalogs/masterpage/pdftron/lib', { recursive: true });
-    ncp('./pdftron-webpart-sample/node_modules/@pdftron/webviewer/public/', './pdftron-webpart-sample/_catalogs/masterpage/pdftron/lib/', e => {
-      if (!!e) {
-        console.log(e);
-      }
-      ncp('./web-part-src/', './pdftron-webpart-sample/src/webparts/pdfTronSample', e => console.log(e));
-      ncp('./sample-documents/', './pdftron-webpart-sample/', e => console.log(e));
-    });
-  });
-});
-*/
