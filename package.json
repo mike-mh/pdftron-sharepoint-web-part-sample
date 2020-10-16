@@ -1,0 +1,13 @@
+{
+  "name": "yo-test",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "init": "node ./scripts/init.js"
+  },
+  "author": "Michael Mitchell",
+  "license": "ISC",
+  "dependencies": {
+    "ncp": "^2.0.0"
+  }
+}
