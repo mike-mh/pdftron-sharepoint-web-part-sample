@@ -1,109 +1,80 @@
 const { spawn } = require("child_process");
 const fs = require('fs');
 
+const createProcessPromise = (command, args, failureMessage, eventCallbackModifier) => new Promise((res, rej) => {
+  const newProcess = spawn(command, args);
 
-const runNpmInstall = () => new Promise((res, rej) => {
+  newProcess.stdout.pipe(process.stdout);
+  newProcess.stderr.pipe(process.stderr);
 
-  const npmInstallProcess = spawn('npm', [
-    'i',
-  ]);
+  if (!!eventCallbackModifier) {
+    eventCallbackModifier(newProcess);
+  }
 
-  npmInstallProcess.stdout.pipe(process.stdout);
-  npmInstallProcess.stderr.pipe(process.stderr);
-
-  npmInstallProcess.on('exit', code => {
+  newProcess.on('exit', code => {
     if (!!code) {
-      rej('Failed to install npm packages');
-    } 
-    res();
-  });
-
-});
-
-const runYeomanSharePointGenerator = () => new Promise((res, rej) => {
-  const generatorProcess = spawn('yo', [
-    '@microsoft/sharepoint',
-    '--skip-cache',
-    '--solution-name',
-    'pdftron-webpart-sample',
-    '--component-type',
-    'webpart',
-    '--framework',
-    'none',
-    '--environment',
-    'spo',
-    '--component-name',
-    'PDFTronSample',
-    '--component-description',
-    '"PDFTron WebViewer sample web part"',
-  ]);
-
-  generatorProcess.stdout.pipe(process.stdout);
-  generatorProcess.stderr.pipe(process.stderr);
-
-  generatorProcess.stdout.on('data', function (data) {
-    if (data.toString().includes('?')) {
-      generatorProcess.stdin.write("N\n")
+      rej(failureMessage);
     }
-  });
-
-  generatorProcess.stderr.on('data', function (data) {
-    if (data.toString().includes('?')) {
-      generatorProcess.stdin.write("N\n")
-    }
-  });
-
-  generatorProcess.on('exit', code => {
-    if (!!code) {
-      rej('Failed to run @microsoft/sharepoint generator');
-    } 
     res();
   });
 });
 
-const installPdfTronWebViewer = () => new Promise((res, rej) => {
-  installPdfTronProcess = spawn('npm', [
-    '--prefix',
-    'pdftron-webpart-sample',
-    'i',
-    '@pdftron/webviewer',
-    '--save',
-  ]);
+const runNpmInstall = () => createProcessPromise('npm', ['i'], 'Failed to install npm packages');
 
-  installPdfTronProcess.stdout.pipe(process.stdout);
-  installPdfTronProcess.stderr.pipe(process.stderr);
+const runYeomanSharePointGenerator = () => createProcessPromise('yo', [
+  '@microsoft/sharepoint',
+  '--skip-cache',
+  '--solution-name',
+  'pdftron-webpart-sample',
+  '--component-type',
+  'webpart',
+  '--framework',
+  'none',
+  '--environment',
+  'spo',
+  '--component-name',
+  'PDFTronSample',
+  '--component-description',
+  '"PDFTron WebViewer sample web part"',
+],
+  'Failed to run @microsoft/sharepoint generator',
+  p => {
+    p.stdout.on('data', function (data) {
+      if (data.toString().includes('?')) {
+        p.stdin.write("N\n")
+      }
+    });
 
-  installPdfTronProcess.on('exit', code => {
-    if (!!code) {
-      rej('Failed to install PDFTron WebViewer');
-    } 
-    res();
+    p.stderr.on('data', function (data) {
+      if (data.toString().includes('?')) {
+        p.stdin.write("N\n")
+      }
+    });
   });
-});
 
-const trustDevCert = () => new Promise((res, rej) => {
+const installPdfTronWebViewer = () => createProcessPromise('npm', [
+  '--prefix',
+  'pdftron-webpart-sample',
+  'i',
+  '@pdftron/webviewer',
+  '--save',
+],
+  'Failed to install PDFTron WebViewer');
+
+const trustDevCert = async () => {
   process.chdir('./pdftron-webpart-sample');
-  trustDevCertificateProcess = spawn('gulp', [
-    'trust-dev-cert',
-  ]);
-
-  trustDevCertificateProcess.stdout.pipe(process.stdout);
-  trustDevCertificateProcess.stderr.pipe(process.stderr);
-
-  trustDevCertificateProcess.on('exit', code => {
-    if (!!code) {
-      rej('Failed to trust dev certificate');
-    } 
-    process.chdir('..');
-    res();
-  });
-}); 
+  await createProcessPromise('gulp', ['trust-dev-cert'], 'Failed to trust dev certificate');
+  process.chdir('..');
+  return Promise.resolve();
+};
 
 const migratePdfTronWebPart = () => new Promise((res, rej) => {
   const ncp = require('ncp').ncp;
   ncp.limit = 16;
 
   fs.mkdirSync('./pdftron-webpart-sample/_catalogs/masterpage/pdftron/lib', { recursive: true });
+  fs.mkdirSync('./pdftron-webpart-sample/Shared Documents');
+
   ncp('./pdftron-webpart-sample/node_modules/@pdftron/webviewer/public/', './pdftron-webpart-sample/_catalogs/masterpage/pdftron/lib/', e => {
     if (!!e) {
       rej('Failed to create PDFTron WebViewer path directories', e)
@@ -114,11 +85,16 @@ const migratePdfTronWebPart = () => new Promise((res, rej) => {
         rej('Failed to migrate sample web part source code', e);
       }
 
-      ncp('./sample-documents/', './pdftron-webpart-sample/', e => !!e ? rej('Failed to migrate sample documents') : res());
+      ncp('./sample-documents/', './pdftron-webpart-sample/Shared Documents', e => !!e ? rej('Failed to migrate sample documents') : res());
     });
-    
+
   });
 });
+
+const launchWebPart = () => {
+  process.chdir('./pdftron-webpart-sample');
+  return createProcessPromise('gulp', ['serve'], 'Failed to start SharePoint server');
+};
 
 async function main() {
   try {
@@ -127,6 +103,7 @@ async function main() {
     await trustDevCert();
     await installPdfTronWebViewer();
     await migratePdfTronWebPart();
+    await launchWebPart();
   }
   catch (e) {
     console.log(e);

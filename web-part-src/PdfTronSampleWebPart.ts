@@ -25,7 +25,7 @@ export default class PdfTronSampleWebPart extends BaseClientSideWebPart<IPdfTron
       path: '/_catalogs/masterpage/pdftron/lib',
       //html5Path: './ui/index.aspx',
       //initialDoc: '/Shared Documents/file-sample_100kb.docx',
-      initialDoc: '/webviewer-demo.pdf',
+      initialDoc: '/Shared Documents/webviewer-demo.pdf',
     } as any), this.domElement).then((i) => {
 
       (i as any).i18n.on('loaded', () => {
