@@ -69,26 +69,32 @@ const trustDevCert = async () => {
 };
 
 const migratePdfTronWebPart = () => new Promise((res, rej) => {
-  const ncp = require('ncp').ncp;
-  ncp.limit = 16;
 
+  // Create directories to match routes for what guides will show
   fs.mkdirSync('./pdftron-webpart-sample/_catalogs/masterpage/pdftron/lib', { recursive: true });
   fs.mkdirSync('./pdftron-webpart-sample/Shared Documents');
 
-  ncp('./pdftron-webpart-sample/node_modules/@pdftron/webviewer/public/', './pdftron-webpart-sample/_catalogs/masterpage/pdftron/lib/', e => {
-    if (!!e) {
-      rej('Failed to create PDFTron WebViewer path directories', e)
-    }
+  const ncp = require('ncp').ncp;
+  ncp.limit = 16;
 
-    ncp('./web-part-src/', './pdftron-webpart-sample/src/webparts/pdfTronSample', e => {
-      if (!!e) {
-        rej('Failed to migrate sample web part source code', e);
-      }
+  const migrateFiles = (src, dest, callback) => ncp(src, dest, callback);
 
-      ncp('./sample-documents/', './pdftron-webpart-sample/Shared Documents', e => !!e ? rej('Failed to migrate sample documents') : res());
-    });
+  const migrateSampleDocs = () => migrateFiles(
+    './sample-documents/',
+    './pdftron-webpart-sample/Shared Documents',
+    e => !!e ? rej('Failed to migrate sample documents') : res());
 
-  });
+  const migratePdfTronWebPartSourceCode = () => migrateFiles(
+    './web-part-src/',
+    './pdftron-webpart-sample/src/webparts/pdfTronSample',
+    e => !!e ? rej('Failed to migrate PDFTron web part source code') : migrateSampleDocs());
+
+  const migratePdfTronWebViewerSource = () => migrateFiles(
+    './pdftron-webpart-sample/node_modules/@pdftron/webviewer/public/',
+    './pdftron-webpart-sample/_catalogs/masterpage/pdftron/lib/',
+    e => !!e ? rej('Failed to migrate PDFTron WebViewer source code from node_modules') : migratePdfTronWebPartSourceCode());
+
+  migratePdfTronWebViewerSource();
 });
 
 const launchWebPart = () => {
@@ -111,4 +117,3 @@ async function main() {
 }
 
 main();
-
