@@ -35,7 +35,8 @@ certificate for `localhost`. For more information on why this is necessary, see:
 https://docs.microsoft.com/en-us/sharepoint/dev/spfx/set-up-your-development-environment#trusting-the-self-signed-developer-certificate
 
 ```bash
-# Please note that it is expected for this command to take upwards of 10 minutes
+# Please note that it is expected for this command to take upwards of 5 minutes if running natively on Windows
+# If you are running on WSL, note that it could take anywhere from 5-10 minutes
 npm run init
 cd pdftron-webpart-sample
 gulp serve
