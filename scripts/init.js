@@ -1,6 +1,12 @@
 const { spawn } = require("child_process");
 const fs = require('fs');
 
+const isWindows = process.platform === 'win32';
+
+const NPM_COMMAND = isWindows ? 'npm.cmd' : 'npm';
+const YO_COMMAND = isWindows ? 'yo.cmd' : 'yo';
+const GULP_COMMAND = isWindows ? 'gulp.cmd' : 'gulp';
+
 const createProcessPromise = (command, args, failureMessage, eventCallbackModifier) => new Promise((res, rej) => {
   const newProcess = spawn(command, args);
 
@@ -19,9 +25,9 @@ const createProcessPromise = (command, args, failureMessage, eventCallbackModifi
   });
 });
 
-const runNpmInstall = () => createProcessPromise('npm', ['i'], 'Failed to install npm packages');
+const runNpmInstall = () => createProcessPromise(NPM_COMMAND, ['i'], 'Failed to install npm packages');
 
-const runYeomanSharePointGenerator = () => createProcessPromise('yo', [
+const runYeomanSharePointGenerator = () => createProcessPromise(YO_COMMAND, [
   '@microsoft/sharepoint',
   '--skip-cache',
   '--solution-name',
@@ -52,7 +58,7 @@ const runYeomanSharePointGenerator = () => createProcessPromise('yo', [
     });
   });
 
-const installPdfTronWebViewer = () => createProcessPromise('npm', [
+const installPdfTronWebViewer = () => createProcessPromise(NPM_COMMAND, [
   '--prefix',
   'pdftron-webpart-sample',
   'i',
@@ -63,7 +69,7 @@ const installPdfTronWebViewer = () => createProcessPromise('npm', [
 
 const trustDevCert = async () => {
   process.chdir('./pdftron-webpart-sample');
-  await createProcessPromise('gulp', ['trust-dev-cert'], 'Failed to trust dev certificate');
+  await createProcessPromise(GULP_COMMAND, ['trust-dev-cert'], 'Failed to trust dev certificate');
   process.chdir('..');
   return Promise.resolve();
 };
@@ -99,7 +105,7 @@ const migratePdfTronWebPart = () => new Promise((res, rej) => {
 
 const launchWebPart = () => {
   process.chdir('./pdftron-webpart-sample');
-  return createProcessPromise('gulp', ['serve'], 'Failed to start SharePoint server');
+  return createProcessPromise(GULP_COMMAND, ['serve'], 'Failed to start SharePoint server');
 };
 
 async function main() {
