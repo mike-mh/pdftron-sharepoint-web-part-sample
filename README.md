@@ -27,7 +27,7 @@ After this is installed you'll need to install the [*@microsoft/sharepoint*](htt
 npm i @microsoft/generator-sharepoint -g
 ```
 
-After this is done you can run `npm init` and the web part will be built for you. Go into the `pdftron-webpart-sample` directory and run `gulp serve` to start a workbench with the sample WebViewer.
+After this is done you can run `npm run init` and the web part will be built for you. Go into the `pdftron-webpart-sample` directory and run `gulp serve` to start a workbench with the sample WebViewer.
 
 ```
 npm run init
