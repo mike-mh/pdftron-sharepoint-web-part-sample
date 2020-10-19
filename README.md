@@ -10,7 +10,7 @@ npm i -g yo
 npm i -g gulp
 ```
 
-After this is installed you'll need to install the *@microsoft/sharepoint* generator
+After this is installed you'll need to install the [*@microsoft/sharepoint*](https://www.npmjs.com/package/@microsoft/generator-sharepoint) generator
 
 ```
 npm i @microsoft/generator-sharepoint -g
