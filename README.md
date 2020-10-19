@@ -29,7 +29,8 @@ npm i @microsoft/generator-sharepoint -g
 
 After this is done you can run `npm run init` and the web part will be built for you. Go into the `pdftron-webpart-sample` directory and run `gulp serve` to start a workbench with the sample WebViewer.
 
-```
+```bash
+# Please note that it is expected for this command to take upwards of 10 minutes
 npm run init
 cd pdftron-webpart-sample
 gulp serve
