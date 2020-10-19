@@ -1,7 +1,19 @@
 # pdftron-sharepoint-web-part-sample
 A simple SharePoint web part build with PDFTron WebViewer 
 
-Before beginning it is highly recommended that you are using no version of Node higher than 10. 
+## Requirements
+
+```
+node <= 10.x
+```
+
+To manually install the latest version of `Node 10.x`:
+
+https://nodejs.org/dist/latest-v10.x/
+
+If you'd like to easily switch between versions of Node, check out [nvm](https://github.com/nvm-sh/nvm).
+
+## Installation
 
 To get started you'll need Yeoman and Gulp installed.
 
