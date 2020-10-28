@@ -32,7 +32,7 @@ export default class PdftronSampleWebPartWebPart extends BaseClientSideWebPart<I
 
     WebViewer(({
       path: '/_catalogs/masterpage/pdftron/lib',
-      uiPath: './ui/index.aspx'
+      html5Path: './ui/index.aspx'
     } as any), this.domElement).then(async i => {
       const { docViewer } = i;
 
