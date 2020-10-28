@@ -33,39 +33,38 @@ export default class PdftronSampleWebPartWebPart extends BaseClientSideWebPart<I
     WebViewer(({
       path: '/_catalogs/masterpage/pdftron/lib',
       uiPath: './ui/index.aspx'
-    } as any), this.domElement).then(async (i) => {
+    } as any), this.domElement).then(async i => {
       const { docViewer } = i;
 
-      this.getSharedFileOptions()
-        .then(options => {
-          i.setHeaderItems(header => {
-            const renderSlider = () => {
-              const select = document.createElement("select");
+      const options = await this.getSharedFileOptions()
 
-              for (const val of options) {
-                const option = document.createElement("option");
-                option.value = val[1];
-                option.text = val[0];
-                select.appendChild(option);
-              }
+      i.setHeaderItems(header => {
+        const renderSlider = () => {
+          const select = document.createElement("select");
 
-              select.onchange = _ => {
-                i.loadDocument(select.value);
-              };
+          for (const val of options) {
+            const option = document.createElement("option");
+            option.value = val[1];
+            option.text = val[0];
+            select.appendChild(option);
+          }
 
-              if (!docViewer.getDocument() && !!options.length) {
-                i.loadDocument(options[0][1]);
-              }
+          select.onchange = _ => {
+            i.loadDocument(select.value);
+          };
 
-              return select;
-            };
+          if (!docViewer.getDocument() && !!options.length) {
+            i.loadDocument(options[0][1]);
+          }
 
-            header.push({
-              type: 'customElement',
-              render: renderSlider
-            });
-          });
+          return select;
+        };
+
+        header.push({
+          type: 'customElement',
+          render: renderSlider
         });
+      });
 
       (i as any).i18n.on('loaded', () => {
         (i as any).i18n.addResourceBundle('en', 'translation', englishJson, true, true);
